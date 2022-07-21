@@ -79,8 +79,12 @@ abstract contract Ownable is Context {
 contract MyContract is Ownable {
 
     uint public number;
-    
-    function setNumber(uint newNumber) public onlyOwner {
+
+    function getMyNumber() public view returns (uint) {
+        return number;
+    }
+
+    function setMyNumber(uint newNumber) public onlyOwner {
         number = newNumber;
     }
 
