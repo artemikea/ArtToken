@@ -3,6 +3,7 @@
 const { accounts, contract } = require('@openzeppelin/test-environment');
 
 const { expect } = require('chai');
+const {expectRevert} = require("@openzeppelin/test-helpers");
 
 const MyContract = contract.fromArtifact('MyContract');
 
@@ -15,6 +16,8 @@ describe('MyContract', function () {
         myContract = await MyContract.new({from: owner});
     });
 
+
+
     it('the deployer is the owner', async function () {
         expect(await myContract.owner()).to.equal(owner);
     });
@@ -23,23 +26,27 @@ describe('MyContract', function () {
         expect(await myContract.owner()).to.not.equal(someone);
     });
 
+
+
     it('transfer ownership from owner to someone', async function () {
         await myContract.transferOwnership(someone, {from:owner});
         expect(await myContract.owner()).to.equal(someone);
     });
 
     it('transfer ownership not from owner to someone', async function () {
-        await myContract.transferOwnership(someone, {form:someone});
-        expect(await myContract.owner()).to.not.equal(someone);
+        await expectRevert(myContract.transferOwnership(someone, {from:someone}),
+            "Ownable: caller is not the owner")
     });
+
+
 
     it('owner set number', async function () {
         await myContract.setMyNumber(10, {from:owner});
-        expect(await myContract.getMyNumber()).to.equal(10);
+        expect(await myContract.getMyNumber()).to.be.bignumber.equal('10');
     });
 
     it('someone set number', async function () {
-        await myContract.setMyNumber(10, {from:someone});
-        expect(await myContract.getMyNumber()).to.not.equal(10);
+        await expectRevert(myContract.setMyNumber(10, {from:someone}),
+            "Ownable: caller is not the owner")
     });
 });
