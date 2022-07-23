@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: unlicensed
 pragma solidity ^0.8.7;
 
+import "./I.sol";
+
 abstract contract Context {
     function _msgSender() internal view virtual returns (address) {
         return msg.sender;
@@ -76,9 +78,11 @@ abstract contract Ownable is Context {
     }
 }
 
-contract MyContract is Ownable {
+contract MyContract is Ownable, I {
 
     uint public number;
+    string public name = "SomeToken";
+    string public symbol = "ST";
 
     function getMyNumber() public view returns (uint) {
         return number;
@@ -88,4 +92,13 @@ contract MyContract is Ownable {
         number = newNumber;
     }
 
+    function name() public view returns (string) {
+        require(name != null);
+        return name;
+    }
+
+    function symbol() public view returns (string) {
+        require(symbol != null);
+        return symbol;
+    }
 }
