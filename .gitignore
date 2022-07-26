@@ -6,6 +6,11 @@ HELP.md
 node_modules/
 target/
 !.mvn/wrapper/maven-wrapper.jar
+test/bnsnft.test.js
+test/bnsrepository.test.js
+test/bnssimplestorage.test.js
+test/token.test.js
+test/bnsrepowithsimplestorage.test.js
 
 ### STS ###
 .apt_generated
