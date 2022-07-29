@@ -50,6 +50,8 @@ describe('ArtCoin', async function () {
         it('works correctly', async function () {
             const balance1Before = await token.balanceOf(account1);
             const balance2Before = await token.balanceOf(account2);
+            expect(await token.balanceOf(account1)).to.be.bignumber.equal(balance1Before);
+            expect(await token.balanceOf(account2)).to.be.bignumber.equal(balance2Before);
             const amountToTransfer = ether('123321');
             await token.transfer(account2, amountToTransfer, { from: account1 });
             const balance1After = await token.balanceOf(account1);
