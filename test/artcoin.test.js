@@ -41,6 +41,10 @@ describe('ArtCoin', async function () {
         token = await ArtCoin.new(initialAccounts, initialBalances, { from: owner });
     });
 
+    it('works', async function () {
+        const amount = ether('400000000');
+        expect(await token.balanceOf(account1)).to.be.bignumber.equal(amount);
+    });
 
     describe('transfer', function () {
         it('works correctly', async function () {
