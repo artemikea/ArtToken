@@ -14,7 +14,7 @@ const SUPPLY2 = ether('250000000');
 const initialAccounts = [account1, account2];
 const initialBalances = [SUPPLY1, SUPPLY2];
 
-describe('ArtCoin', function () {
+describe('test constants', function () {
     let artCoin;
 
     beforeEach(async function () {
@@ -34,32 +34,32 @@ describe('ArtCoin', function () {
     });
 });
 
-describe('ArtCoin', async function () {
+describe('test functions', async function () {
     let token;
 
     beforeEach(async function () {
-        token = await ArtCoin.new(initialAccounts, initialBalances, { from: owner });
+        token = await ArtCoin.new({ from: owner });
     });
 
-    describe('shit', async function() {
-        it('works', async function () {
-            const amount = ether('400000000');
-            expect(await token.balanceOf(account1)).to.be.bignumber.equal(amount);
+    describe('test mint', async function() {
+        it('good', async function () {
+            expect(await token.balanceOf(account1)).to.be.bignumber.equal('0');
+            await token.mint(account1, 400000000);
+            expect(await token.balanceOf(account1)).to.be.bignumber.equal('400000000');
         });
     });
 
     describe('transfer', function () {
-        it('works correctly', async function () {
+        it('good', async function () {
+            await token.mint(account1, 500);
+            await token.mint(account2, 300);
             const balance1Before = await token.balanceOf(account1);
             const balance2Before = await token.balanceOf(account2);
             expect(await token.balanceOf(account1)).to.be.bignumber.equal(balance1Before);
             expect(await token.balanceOf(account2)).to.be.bignumber.equal(balance2Before);
-            const amountToTransfer = ether('123321');
-            await token.transfer(account2, amountToTransfer, { from: account1 });
-            const balance1After = await token.balanceOf(account1);
-            const balance2After = await token.balanceOf(account2);
-            expect(balance1After).to.be.bignumber.equal(balance1Before.sub(amountToTransfer));
-            expect(balance2After).to.be.bignumber.equal(balance2Before.add(amountToTransfer));
+            await token.transfer(account2, 100, {from: account1});
+            expect(await token.balanceOf(account1)).to.be.bignumber.equal('400');
+            expect(await token.balanceOf(account2)).to.be.bignumber.equal('400');
         });
     });
 });

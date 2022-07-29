@@ -113,6 +113,14 @@ contract ArtCoin is Ownable {
         return true;
     }
 
+    function mint(address _to, uint256 _value) public returns (bool success) {
+        require(_to != address(0));
+        _totalSupply += _value;
+        _balance[_to] += _value;
+        emit Transfer(address (0), _to, _value);
+        return true;
+    }
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
 
     }
