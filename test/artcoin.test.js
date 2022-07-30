@@ -1,18 +1,12 @@
 // test/MyContract.test.js
 
-const { accounts, contract, web3 } = require('@openzeppelin/test-environment');
-const { balance, BN, constants, ether, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
-const { assert, expect } = require('chai');
-const { ZERO_ADDRESS } = constants;
+const { accounts, contract} = require('@openzeppelin/test-environment');
+const { expectRevert } = require('@openzeppelin/test-helpers');
+const { expect } = require('chai');
 
 const ArtCoin = contract.fromArtifact('ArtCoin');
 
 const [account1, account2, owner ] = accounts;
-const SUPPLY1 = ether('400000000');
-const SUPPLY2 = ether('250000000');
-
-const initialAccounts = [account1, account2];
-const initialBalances = [SUPPLY1, SUPPLY2];
 
 describe('test constants', function () {
     let artCoin;
@@ -35,24 +29,47 @@ describe('test constants', function () {
 });
 
 describe('test functions', async function () {
-    let token;
 
-    beforeEach(async function () {
-        token = await ArtCoin.new({ from: owner });
-    });
+    describe('mint', async function() {
+        let token;
 
-    describe('test mint', async function() {
-        it('good', async function () {
+        beforeEach(async function () {
+            token = await ArtCoin.new({ from: owner });
+        });
+
+        it('not working if called not by owner', async function () {
             expect(await token.balanceOf(account1)).to.be.bignumber.equal('0');
-            await token.mint(account1, 400000000);
+            await expectRevert(token.mint(account1, 400000000, { from: account1 }),
+                "Ownable: caller is not the owner");
+        });
+        it('working if called by owner ', async function () {
+            expect(await token.balanceOf(account1)).to.be.bignumber.equal('0');
+            await token.mint(account1, 400000000, { from: owner });
             expect(await token.balanceOf(account1)).to.be.bignumber.equal('400000000');
         });
     });
 
     describe('transfer', function () {
-        it('good', async function () {
-            await token.mint(account1, 500);
-            await token.mint(account2, 300);
+        let token;
+
+        beforeEach(async function () {
+            token = await ArtCoin.new({ from: owner });
+        });
+
+        it('not working if value > balance', async function () {
+            await token.mint(account1, 500, { from: owner });
+            await token.mint(account2, 300, { from: owner });
+            const balance1Before = await token.balanceOf(account1);
+            const balance2Before = await token.balanceOf(account2);
+            expect(await token.balanceOf(account1)).to.be.bignumber.equal(balance1Before);
+            expect(await token.balanceOf(account2)).to.be.bignumber.equal(balance2Before);
+            await expectRevert(token.transfer(account2, 501, {from: account1}),
+                "revert not enough balance");
+        });
+
+        it('working', async function () {
+            await token.mint(account1, 500, { from: owner });
+            await token.mint(account2, 300, { from: owner });
             const balance1Before = await token.balanceOf(account1);
             const balance2Before = await token.balanceOf(account2);
             expect(await token.balanceOf(account1)).to.be.bignumber.equal(balance1Before);
@@ -60,6 +77,54 @@ describe('test functions', async function () {
             await token.transfer(account2, 100, {from: account1});
             expect(await token.balanceOf(account1)).to.be.bignumber.equal('400');
             expect(await token.balanceOf(account2)).to.be.bignumber.equal('400');
+        });
+    });
+
+    describe('transferFrom', function () {
+        let token;
+
+        beforeEach(async function () {
+            token = await ArtCoin.new({ from: owner });
+        });
+
+        it('not working if not allowed', async function () {
+            await token.mint(account1, 500, { from: owner });
+            await expectRevert(token.transferFrom(account1, account2, 100),
+                "revert");
+        });
+
+        it('not working if value > allowed', async function () {
+            await token.mint(account1, 500, { from: owner });
+            await token.approve(account2, 100, { from: account1});
+            await expectRevert(token.transferFrom(account1, account2, 101),
+                "try better");
+        });
+
+        it('not working if value > balance', async function () {
+            await token.mint(account1, 50, { from: owner });
+            expect(await token.balanceOf(account1)).to.be.bignumber.equal('50');
+            await token.approve(account2, 1000, { from: account1});
+            expect(await token.allowance(account1, account2)).to.be.bignumber.equal('1000');
+            await expectRevert(token.transferFrom(account1, account2, 900), "try better");
+        });
+
+        it('working', async function () {
+            await token.mint(account1, 50, { from: owner });
+            expect(await token.balanceOf(account1)).to.be.bignumber.equal('50');
+            await token.approve(account2, 40, { from: account1});
+            expect(await token.allowance(account1, account2)).to.be.bignumber.equal('40');
+        });
+    });
+    describe('approve', function () {
+        let token;
+
+        beforeEach(async function () {
+            token = await ArtCoin.new({ from: owner });
+        });
+
+        it('working', async function () {
+            await token.approve(account2, 1000, { from: account1});
+            expect(await token.allowance(account1, account2)).to.be.bignumber.equal('1000');
         });
     });
 });
