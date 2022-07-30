@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: unlicensed
 pragma solidity ^0.8.7;
 
-interface IArtCoin {
+interface IArtToken {
     function name() external view returns (string memory);
     function symbol() external view returns (string memory);
     function decimals() external view returns (uint8);

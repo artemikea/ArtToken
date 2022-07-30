@@ -4,27 +4,27 @@ const { accounts, contract} = require('@openzeppelin/test-environment');
 const { expectRevert } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 
-const ArtCoin = contract.fromArtifact('ArtCoin');
+const ArtToken = contract.fromArtifact('ArtToken');
 
 const [account1, account2, owner ] = accounts;
 
 describe('test constants', function () {
-    let artCoin;
+    let token;
 
     beforeEach(async function () {
-        artCoin = await ArtCoin.new({from: owner});
+        token = await ArtToken.new({from: owner});
     });
 
-    it('check name is ArtCoin', async function () {
-        expect(await artCoin.name()).to.equal("ArtCoin");
+    it('check name is ArtToken', async function () {
+        expect(await token.name()).to.equal("ArtToken");
     });
 
-    it('check symbol is AC', async function () {
-        expect(await artCoin.symbol()).to.equal("AC");
+    it('check symbol is AT', async function () {
+        expect(await token.symbol()).to.equal("AT");
     });
 
     it('check decimals is 18', async function () {
-        expect(await artCoin.decimals()).to.be.bignumber.equal('18');
+        expect(await token.decimals()).to.be.bignumber.equal('18');
     });
 });
 
@@ -34,7 +34,7 @@ describe('test functions', async function () {
         let token;
 
         beforeEach(async function () {
-            token = await ArtCoin.new({ from: owner });
+            token = await ArtToken.new({ from: owner });
         });
 
         it('not working if called not by owner', async function () {
@@ -53,7 +53,7 @@ describe('test functions', async function () {
         let token;
 
         beforeEach(async function () {
-            token = await ArtCoin.new({ from: owner });
+            token = await ArtToken.new({ from: owner });
         });
 
         it('not working if value > balance', async function () {
@@ -84,7 +84,7 @@ describe('test functions', async function () {
         let token;
 
         beforeEach(async function () {
-            token = await ArtCoin.new({ from: owner });
+            token = await ArtToken.new({ from: owner });
         });
 
         it('not working if not allowed', async function () {
@@ -119,7 +119,7 @@ describe('test functions', async function () {
         let token;
 
         beforeEach(async function () {
-            token = await ArtCoin.new({ from: owner });
+            token = await ArtToken.new({ from: owner });
         });
 
         it('working', async function () {
